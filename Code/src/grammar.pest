@@ -1,0 +1,49 @@
+WHITESPACE = _{ WHITE_SPACE }
+
+program = {
+    "digraph" ~ program_name? ~ "{" ~ program_body ~ "}" ~ ";"?
+}
+
+program_body = {
+    line*
+}
+
+program_name = { (ALPHABETIC | "_")+ }
+
+line = _{
+    variable_def
+  | connection_def
+}
+
+variable_def = {
+    variable ~ attributes? ~ ";"
+}
+
+connection_def = {
+    (variable ~ "->")+ ~ variable ~ attributes? ~ ";"
+}
+
+attributes = {
+    "[" ~ attribute+ ~ "]"
+}
+
+attribute = ${
+    attribute_name ~ "=" ~ quoted_attribute_value ~ " "? ~ ","?
+}
+
+quoted_attribute_value = _{ "\"" ~ attribute_value ~ "\"" }
+
+attribute_value = @{ char* }
+char = {
+    !("\"" | "\\") ~ ANY
+    | "\\" ~ ("\"" | "\\" | "/" | "b" | "f" | "n" | "r" | "t")
+    | "\\" ~ ("u" ~ ASCII_HEX_DIGIT{4})
+}
+
+attribute_name  = ${
+    ALPHABETIC+
+}
+
+variable        = ${
+    ALPHABETIC+
+}

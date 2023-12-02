@@ -1,0 +1,42 @@
+WHITESPACE = _{ WHITE_SPACE }
+
+expression = {
+    first ~ condition ~ second
+}
+
+first = {
+    side
+}
+
+second = {
+    side
+}
+
+side = _{
+    (json_prefix ~ json_value)
+  | number_value | string_value
+}
+
+number_value = {ASCII_DIGIT+}
+string_value = @{ char+ }
+json_value  = @{ char+ }
+json_prefix = _{ "." }
+char        =  {
+    (ALPHABETIC | "_")+
+}
+
+condition = {
+    less_than
+  | greater_than
+  | less_than_eq_to
+  | greater_than_eq_to
+  | equal
+  | not_equal
+}
+
+less_than          = { "<" }
+greater_than       = { ">" }
+less_than_eq_to    = { "<=" }
+greater_than_eq_to = { ">=" }
+equal              = { "==" }
+not_equal          = { "!=" }
