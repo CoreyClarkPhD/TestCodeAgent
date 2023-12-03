@@ -61,6 +61,25 @@ fn main() -> Result<()> {
         }
     }
 
+    // Check for unsaved files
+    if let Err(e) = git::check_unsaved_files(&args.directory) {
+        match e {
+            git::GitError::UnsavedFiles => {
+                println!("Unsaved files found. Please save and commit them before running the code agent.");
+                return Ok(());
+            }
+            git::GitError::UncommittedFiles => {
+                println!("Uncommitted files found. Please commit, discard or stash them before running the code agent.");
+                return Ok(());
+            }
+        }
+    }
+
+
+
+
+
+
     println!("Files: {:?}", file_paths);
 
     Ok(())
