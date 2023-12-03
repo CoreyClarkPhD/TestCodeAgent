@@ -7,8 +7,6 @@ use system::job_core::Job;
 
 use anyhow::Result;
 
-use crate::system::types::JobType;
-
 mod ai;
 mod compiler;
 mod files;
@@ -22,7 +20,7 @@ mod transform;
 #[command(author, version, about)]
 struct Args {
     #[arg(num_args = 1.., value_delimiter = ' ', help = "Input files")]
-    files: Vec<PathBuf>, // Change to Vec<PathBuf> to accept multiple positional values
+    files: Vec<PathBuf>,
 
     #[arg(short, long, default_value = "false")]
     reprompt_flowscript: bool,
@@ -91,9 +89,6 @@ fn main() -> Result<()> {
     println!("Files: {:?}", file_paths);
 
     system::create_worker_thread();
-    system::run_job_fs("Test".to_owned(), json!({"test": "input"}));
-    let test  = TestJob{};
-    system::run_job(JobType::Test, test);
 
     Ok(())
 }
