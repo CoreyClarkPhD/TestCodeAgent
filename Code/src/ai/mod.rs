@@ -153,14 +153,14 @@ fn extract_response_code(response: &str) -> (String, String) {
 
         if in_code_block {
             response_code.push_str(line);
-            response_code.push_str("\n");
+            response_code.push('\n');
         } else {
             explanation.push_str(line);
-            explanation.push_str("\n");
+            explanation.push('\n');
         }
     }
 
-    return (response_code, explanation);
+    (response_code, explanation)
 }
 
 fn get_attempt_count() -> i32 {

@@ -10,17 +10,13 @@ pub fn get_all_cpp_files_in_folder_path(path: &PathBuf) -> Result<Vec<PathBuf>> 
             let path = entry.path();
             if path.is_dir() {
                 files.append(&mut get_all_cpp_files_in_folder_path(&path)?);
-            } else {
-                if path.extension().unwrap_or_default() == "cpp" {
-                    files.push(path);
-                }
+            } else if path.extension().unwrap_or_default() == "cpp" {
+                files.push(path);
             }
         }
-    } else {
-        if path.extension().unwrap_or_default() == "cpp" {
-            files.push(path.to_owned());
-        }
+    } else if path.extension().unwrap_or_default() == "cpp" {
+        files.push(path.to_owned());
     }
 
-    return Ok(files);
+    Ok(files)
 }

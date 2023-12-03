@@ -43,10 +43,10 @@ fn main() -> Result<()> {
 
     let mut file_paths = args.files;
 
-    if file_paths.len() == 0 {
+    if file_paths.is_empty() {
         // Use the directory flag instead
         file_paths = files::get_all_cpp_files_in_folder_path(&args.directory)?;
-        if file_paths.len() == 0 {
+        if file_paths.is_empty() {
             println!("No C++ files found in directory");
             return Ok(());
         }
