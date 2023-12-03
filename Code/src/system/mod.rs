@@ -1,7 +1,10 @@
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 
+use crate::system::types::JobType;
+
 pub mod job_core;
+pub mod types;
 extern "C" {
     fn Log(message: *const libc::c_char, level: i32);
     fn HasJobsActive() -> bool;
@@ -78,8 +81,29 @@ pub fn destroy_job(job_id: &str) {
     unsafe { DestroyJob(c_job_id.as_ptr()) }
 }
 
-pub fn run_job<'a, T: job_core::Job + Serialize + Deserialize<'a>>(job_type: &str, input: T) -> Value {
-    let c_job_type = std::ffi::CString::new(job_type.to_string()).unwrap();
+// Run a job in the normal code
+pub fn run_job<'a, T: job_core::Job + Serialize + Deserialize<'a>>(
+    job_type: JobType,
+    input: T,
+) -> Value {
+    let c_job_type = std::ffi::CString::new(serde_json::to_string(&job_type).unwrap()).unwrap();
+    let input_json = serde_json::to_string(&input).unwrap();
+    let c_input = std::ffi::CString::new(input_json).unwrap();
+    let c_result = unsafe { RunJob(c_job_type.as_ptr(), c_input.as_ptr()) };
+    let result = unsafe {
+        std::ffi::CStr::from_ptr(c_result)
+            .to_str()
+            .unwrap()
+            .to_string()
+            .clone()
+    };
+
+    serde_json::from_str(result.as_str()).expect("Valid json")
+}
+
+// Used for running a job in flowscript
+pub fn run_job_fs(job_type: String, input: Value) -> Value {
+    let c_job_type = std::ffi::CString::new(serde_json::to_string(&job_type).unwrap()).unwrap();
     let input_json = serde_json::to_string(&input).unwrap();
     let c_input = std::ffi::CString::new(input_json).unwrap();
     let c_result = unsafe { RunJob(c_job_type.as_ptr(), c_input.as_ptr()) };
@@ -116,8 +140,9 @@ pub extern "C" fn run_rust_job(
             .clone();
         let input: serde_json::Value = serde_json::from_str(input.as_str()).expect("Valid json");
 
-        let result = crate::system::job_core::run_job(job_type.as_str(), input);
-        println!("super result :{}", result);
+        let jobtype: JobType = serde_json::from_str(&job_type).unwrap();
+        println!("C++ : {}, enum : {:?}", job_type, jobtype);
+        let result = crate::system::job_core::run_job(jobtype, input);
 
         let c_result = Box::into_raw(Box::new(
             std::ffi::CString::new(result.to_string()).unwrap(),

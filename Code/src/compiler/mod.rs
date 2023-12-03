@@ -1,3 +1,5 @@
+use std::path::PathBuf;
+
 use serde::Deserialize;
 use serde::Serialize;
 use serde_json::Number;
@@ -9,4 +11,16 @@ pub struct CompileJsonOutput {
     pub filepath: String,
     message: String,
     snippet: String,
+}
+
+pub enum ActualCompileError {
+
+}
+
+pub fn compile_files(files: &Vec<PathBuf>) -> Result<Vec<CompileJsonOutput>, ActualCompileError> {
+
+
+
+
+    Ok(vec![])
 }

@@ -1,17 +1,22 @@
 use clap::Parser;
 use dotenv::dotenv;
+use serde::{Deserialize, Serialize};
+use serde_json::json;
 use std::{env, path::PathBuf};
+use system::job_core::Job;
 
 use anyhow::Result;
+
+use crate::system::types::JobType;
 
 mod ai;
 mod compiler;
 mod files;
+mod git;
 mod nodes;
 mod parser;
 mod system;
 mod transform;
-mod git;
 
 #[derive(Parser, Debug)]
 #[command(author, version, about)]
@@ -29,6 +34,15 @@ struct Args {
     api_key: Option<String>,
 }
 
+#[derive(Serialize, Deserialize, Debug)]
+struct TestJob {}
+
+impl Job for TestJob {
+    fn run(&self) -> Result<serde_json::Value> {
+        Ok(json!({"test": "output"}))
+    }
+}
+
 fn main() -> Result<()> {
     let _ = dotenv();
     // Ensure API Token is set
@@ -40,7 +54,6 @@ fn main() -> Result<()> {
             let home = env::var("HOME").expect("HOME not set");
             let env_file = format!("{}/.env", home);
             let _ = dotenv::from_path(env_file.as_str());
-
             println!("OPENAI_TOKEN not set");
             println!("Error: {}", e);
             println!("Please set OPENAI_TOKEN in .env");
@@ -75,12 +88,12 @@ fn main() -> Result<()> {
         }
     }
 
-
-
-
-
-
     println!("Files: {:?}", file_paths);
+
+    system::create_worker_thread();
+    system::run_job_fs("Test".to_owned(), json!({"test": "input"}));
+    let test  = TestJob{};
+    system::run_job(JobType::Test, test);
 
     Ok(())
 }
