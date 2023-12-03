@@ -7,7 +7,7 @@ use pest_derive::Parser;
 use serde_json::Value;
 
 #[derive(Parser)]
-#[grammar = "condition.pest"]
+#[grammar = "./grammar/condition.pest"]
 pub struct ConditionParser;
 
 fn build_pest_error(pair: Pair<Rule>, msg: &str) -> error::Error<Rule> {

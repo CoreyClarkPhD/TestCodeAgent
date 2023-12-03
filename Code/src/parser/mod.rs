@@ -6,7 +6,7 @@ use pest::{iterators::Pair, Parser};
 use pest_derive::Parser;
 
 #[derive(Parser)]
-#[grammar = "grammar.pest"]
+#[grammar = "./grammar/grammar.pest"]
 pub struct FlowscriptParser;
 
 #[derive(Debug)]
