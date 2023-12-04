@@ -8,7 +8,7 @@ use serde_json::Number;
 use crate::system::job_core::Job;
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
-pub struct CompileJsonOutput {
+pub struct MappedJsonError {
     column: Number,
     line: Number,
     pub filepath: String,
@@ -16,7 +16,8 @@ pub struct CompileJsonOutput {
     snippet: String,
 }
 
-pub enum ActualCompileError {}
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct ClangOutputJson {}
 
 pub struct CompileJob {
     files: Vec<PathBuf>,
@@ -32,19 +33,30 @@ impl Job for CompileJob {
 }
 
 impl CompileJob {
-    pub fn new(files: Vec<PathBuf>) -> Self {
-        Self { files }
-    }
+    pub fn compile(&self) -> Result<ClangOutputJson> {
+        let joined_files: Vec<_> = self.files.iter().map(|p| p.to_string_lossy()).collect();
+        let joined_files = joined_files.join(" ");
 
-    pub fn compile(&self) -> Result<CompileJsonOutput> {
-        let output = CompileJsonOutput {
-            column: 0.into(),
-            line: 0.into(),
-            filepath: "".to_string(),
-            message: "".to_string(),
-            snippet: "".to_string(),
-        };
+        let command = format!(
+            "g++-13 -std=c++17 {} -fdiagnostics-format=json",
+            joined_files
+        );
 
-        Ok(output)
+        let command_output = std::process::Command::new("sh")
+            .arg("-c")
+            .arg(command)
+            .output()?;
+
+        let output = String::from_utf8(command_output.stderr)?;
+
+        let output = output
+            .lines()
+            .filter(|line| line.starts_with('{'))
+            .collect::<Vec<_>>()
+            .join("");
+
+        println!("{}", output);
+
+        Ok(ClangOutputJson{})
     }
 }

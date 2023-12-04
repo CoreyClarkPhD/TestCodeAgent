@@ -1,10 +1,10 @@
 use std::vec;
 
-use crate::compiler::CompileJsonOutput;
+use crate::compiler::MappedJsonError;
 
 use super::{Message, Role};
 
-pub fn get_mistral_prompt(output_json: &CompileJsonOutput, file_contents: &str) -> Vec<Message> {
+pub fn get_mistral_prompt(output_json: &MappedJsonError, file_contents: &str) -> Vec<Message> {
     let mut result = vec::Vec::new();
 
     result.push(Message {
@@ -57,7 +57,7 @@ The correction involves adding the line `#include <iostream>` at the top of the 
     result
 }
 
-pub fn get_chat_gpt_prompt(output_json: &CompileJsonOutput, file_contents: &str) -> Vec<Message> {
+pub fn get_chat_gpt_prompt(output_json: &MappedJsonError, file_contents: &str) -> Vec<Message> {
     let mut result = vec::Vec::new();
 
     result.push(Message {
@@ -83,7 +83,7 @@ Print the entire corrected source code file using the ```cpp tag, then an empty 
     result
 }
 
-pub fn get_mini_orca_prompt(output_json: &CompileJsonOutput, file_contents: &str) -> Vec<Message> {
+pub fn get_mini_orca_prompt(output_json: &MappedJsonError, file_contents: &str) -> Vec<Message> {
     let mut result = vec::Vec::new();
 
     result.push(Message {

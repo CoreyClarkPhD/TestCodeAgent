@@ -12,13 +12,11 @@ use fs_prompt::get_flowscript_compile;
 use crate::fs_prompt::save_prompt;
 
 mod ai;
+mod flowscript;
 mod compiler;
 mod files;
 mod git;
-mod nodes;
-mod parser;
 mod system;
-mod transform;
 mod fs_prompt;
 
 #[derive(Parser, Debug)]
@@ -78,6 +76,7 @@ fn main() -> Result<()> {
     }
 
     // Check for unsaved files
+    // TODO: Condense
     if let Err(e) = git::check_unsaved_files(&args.directory) {
         match e {
             git::GitError::UnsavedFiles => {
@@ -101,6 +100,13 @@ fn main() -> Result<()> {
     if args.reprompt_flowscript {
         save_prompt(&prompt)?;
     }
+
+
+
+
+
+
+
 
 
     // Print the prompt

@@ -6,7 +6,7 @@ use pest::{iterators::Pair, Parser};
 use pest_derive::Parser;
 
 #[derive(Parser)]
-#[grammar = "./grammar/grammar.pest"]
+#[grammar = "./flowscript/grammar/grammar.pest"]
 pub struct FlowscriptParser;
 
 #[derive(Debug)]
@@ -278,14 +278,11 @@ fn process_connection_def(pair: Pair<Rule>) -> Result<ConnectionDef, pest::error
     ))
 }
 
-pub fn extract_definitions(filepath: String) -> Result<Defs, pest::error::Error<Rule>> {
+pub fn extract_definitions(script: &str) -> Result<Defs, pest::error::Error<Rule>> {
     let mut vars = HashMap::new();
     let mut conns = Vec::new();
-    let Ok(contents) = std::fs::read_to_string(filepath) else {
-        panic!("Error: Could not read file");
-    };
 
-    let parse = FlowscriptParser::parse(Rule::program, &contents)?;
+    let parse = FlowscriptParser::parse(Rule::program, &script)?;
 
     let defs: Vec<Pair<Rule>> = parse
         .flatten()

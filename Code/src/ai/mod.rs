@@ -11,7 +11,7 @@ use serde_json::{json, Value};
 use crate::ai::prompts::get_chat_gpt_prompt;
 use crate::ai::prompts::get_mini_orca_prompt;
 use crate::ai::prompts::get_mistral_prompt;
-use crate::compiler::CompileJsonOutput;
+use crate::compiler::MappedJsonError;
 use crate::system::job_core::Job;
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -111,7 +111,7 @@ pub fn make_ai_request(prompt: &Vec<Message>, model: &Model) -> Result<ApiRespon
 #[derive(Serialize, Deserialize, Debug)]
 pub struct CompileFix {
     pub model: Model,
-    pub output_json: CompileJsonOutput,
+    pub output_json: MappedJsonError,
     pub file_contents: String,
 }
 
@@ -140,7 +140,7 @@ impl Job for CompileFix {
 }
 
 // TODO: FIX
-fn extract_response_code(response: &str) -> (String, String) {
+pub fn extract_response_code(response: &str) -> (String, String) {
     let mut response_code = String::new();
     let mut explanation = String::new();
     let mut in_code_block = false;

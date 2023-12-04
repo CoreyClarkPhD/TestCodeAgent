@@ -1,9 +1,11 @@
 use std::{cell::RefCell, collections::HashMap};
 
 use anyhow::{anyhow, Result};
-use serde_json::{json, Map, Value};
+use serde_json::{Map, Value};
 
-use crate::parser;
+use crate::system;
+
+use super::{parser, transform::safe_parse_to_value};
 
 pub trait Node {
     fn execute(&self, input: serde_json::Value, node_map: &NodeMap) -> Result<Value>;
@@ -36,8 +38,15 @@ pub struct TaskNode {
 }
 
 impl Node for TaskNode {
-    fn execute(&self, _input: Value, _node_map: &NodeMap) -> Result<Value> {
-        Ok(json!("TaskNode"))
+    fn execute(&self, input: Value, _node_map: &NodeMap) -> Result<Value> {
+        let result = system::run_job_fs(self.command.clone(), input);
+        match self.points_to {
+            Some(ref points_to) => {
+                let node = _node_map.get(points_to).unwrap();
+                node.execute(result, _node_map)
+            }
+            None => Ok(result),
+        }
     }
 }
 
@@ -230,7 +239,7 @@ impl Node for AddFieldNode {
             .ok_or_else(|| anyhow!("Could not get key from field node"))?;
         let value = split.next().unwrap_or("null");
 
-        let value = crate::transform::safe_parse_to_value(value.trim());
+        let value = safe_parse_to_value(value.trim());
 
         new_input.insert(key.to_owned().trim().to_owned(), value);
 
