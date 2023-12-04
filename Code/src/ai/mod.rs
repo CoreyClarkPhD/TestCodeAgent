@@ -60,12 +60,6 @@ pub struct ApiInput {
     messages: Vec<Message>,
 }
 
-#[derive(Serialize, Deserialize, Debug)]
-pub struct CompileFix {
-    pub model: Model,
-    pub output_json: CompileJsonOutput,
-    pub file_contents: String,
-}
 
 pub fn get_url_from_model(model: &Model) -> String {
     match model {
@@ -111,6 +105,17 @@ fn make_ai_request(prompt: &Vec<Message>, model: &Model) -> Result<ApiResponse> 
 
     serde_json::from_str(response.text()?.as_str())
         .map_err(|e| anyhow::anyhow!("Error getting response: {}", e))
+}
+
+
+
+// Compiler fixing
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct CompileFix {
+    pub model: Model,
+    pub output_json: CompileJsonOutput,
+    pub file_contents: String,
 }
 
 impl Job for CompileFix {
