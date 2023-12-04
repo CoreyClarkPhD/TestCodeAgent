@@ -37,7 +37,7 @@ impl CompileJob {
     }
 
     pub fn compile(&self) -> Result<CompileJsonOutput> {
-        let mut output = CompileJsonOutput {
+        let output = CompileJsonOutput {
             column: 0.into(),
             line: 0.into(),
             filepath: "".to_string(),

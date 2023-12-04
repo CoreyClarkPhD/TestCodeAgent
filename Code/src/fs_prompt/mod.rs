@@ -7,12 +7,10 @@ use crate::ai::{make_ai_request, Message, Model, Role};
 pub fn get_flowscript_compile(reprompt: bool) -> Result<String> {
     if reprompt {
         get_flowscript_from_gpt()
+    } else if let Some(flowscript) = get_saved_flowscript() {
+        Ok(flowscript)
     } else {
-        if let Some(flowscript) = get_saved_flowscript() {
-            Ok(flowscript)
-        } else {
-            get_flowscript_from_gpt()
-        }
+        get_flowscript_from_gpt()
     }
 }
 
@@ -57,7 +55,7 @@ fn get_saved_flowscript() -> Option<String> {
     if let Ok(home) = env::var("HOME") {
         let path = format!("{}/.fsprompt", home);
         if let Ok(contents) = fs::read_to_string(path) {
-            if contents.len() > 0 {
+            if !contents.is_empty() {
                 return Some(contents);
             }
         }
