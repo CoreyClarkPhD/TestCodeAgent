@@ -7,7 +7,9 @@ use system::job_core::Job;
 
 use anyhow::Result;
 
-use crate::fs_prompt::get_flowscript_compile;
+use fs_prompt::get_flowscript_compile;
+
+use crate::fs_prompt::save_prompt;
 
 mod ai;
 mod compiler;
@@ -89,12 +91,20 @@ fn main() -> Result<()> {
         }
     }
 
-    println!("Files: {:?}", file_paths);
+    // println!("Files: {:?}", file_paths);
 
     let Ok(prompt) = get_flowscript_compile(args.reprompt_flowscript) else {
         println!("Error getting flowscript");
         return Ok(());
     };
+
+    if args.reprompt_flowscript {
+        save_prompt(&prompt)?;
+    }
+
+
+    // Print the prompt
+    println!("Prompt: {}", prompt);
 
     system::create_worker_thread();
 

@@ -41,12 +41,12 @@ pub struct Message {
 pub struct Choice {
     pub finish_reason: String,
     pub index: i32,
-    message: Message,
+    pub message: Message,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct ApiResponse {
-    choices: Vec<Choice>,
+    pub choices: Vec<Choice>,
     created: i32,
     id: String,
     model: String,
@@ -60,8 +60,7 @@ pub struct ApiInput {
     messages: Vec<Message>,
 }
 
-
-pub fn get_url_from_model(model: &Model) -> String {
+fn get_url_from_model(model: &Model) -> String {
     match model {
         Model::ChatGpt => "https://api.openai.com".to_string(),
         Model::Mistral => "http://localhost:4891".to_string(),
@@ -69,7 +68,7 @@ pub fn get_url_from_model(model: &Model) -> String {
     }
 }
 
-pub fn get_api_model_from_model(model: &Model) -> String {
+fn get_api_model_from_model(model: &Model) -> String {
     match model {
         Model::ChatGpt => "gpt-4-1106-preview".to_string(),
         Model::Mistral => "mistral".to_string(),
@@ -77,7 +76,7 @@ pub fn get_api_model_from_model(model: &Model) -> String {
     }
 }
 
-fn make_ai_request(prompt: &Vec<Message>, model: &Model) -> Result<ApiResponse> {
+pub fn make_ai_request(prompt: &Vec<Message>, model: &Model) -> Result<ApiResponse> {
     let url = format!("{}/v1/chat/completions", get_url_from_model(model));
     let client = reqwest::blocking::Client::builder()
         .timeout(Duration::from_secs(800))
@@ -106,8 +105,6 @@ fn make_ai_request(prompt: &Vec<Message>, model: &Model) -> Result<ApiResponse> 
     serde_json::from_str(response.text()?.as_str())
         .map_err(|e| anyhow::anyhow!("Error getting response: {}", e))
 }
-
-
 
 // Compiler fixing
 
