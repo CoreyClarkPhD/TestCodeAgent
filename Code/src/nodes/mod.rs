@@ -3,7 +3,7 @@ use std::{cell::RefCell, collections::HashMap};
 use anyhow::{anyhow, Result};
 use serde_json::{json, Map, Value};
 
-use crate::{parser};
+use crate::parser;
 
 pub trait Node {
     fn execute(&self, input: serde_json::Value, node_map: &NodeMap) -> Result<Value>;

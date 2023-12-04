@@ -7,6 +7,8 @@ use system::job_core::Job;
 
 use anyhow::Result;
 
+use crate::fs_prompt::get_flowscript_compile;
+
 mod ai;
 mod compiler;
 mod files;
@@ -15,6 +17,7 @@ mod nodes;
 mod parser;
 mod system;
 mod transform;
+mod fs_prompt;
 
 #[derive(Parser, Debug)]
 #[command(author, version, about)]
@@ -87,6 +90,11 @@ fn main() -> Result<()> {
     }
 
     println!("Files: {:?}", file_paths);
+
+    let Ok(prompt) = get_flowscript_compile(args.reprompt_flowscript) else {
+        println!("Error getting flowscript");
+        return Ok(());
+    };
 
     system::create_worker_thread();
 
