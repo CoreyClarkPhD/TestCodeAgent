@@ -3,16 +3,16 @@ use std::env;
 
 use std::time::Duration;
 
-use anyhow::Result;
-use serde::Deserialize;
-use serde::Serialize;
-use serde_json::{json, Value};
-
 use crate::ai::prompts::get_chat_gpt_prompt;
 use crate::ai::prompts::get_mini_orca_prompt;
 use crate::ai::prompts::get_mistral_prompt;
 use crate::output::MappedJsonError;
 use crate::system::job_core::Job;
+
+use anyhow::Result;
+use serde::Deserialize;
+use serde::Serialize;
+use serde_json::Value;
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub enum Model {
@@ -117,6 +117,20 @@ pub struct FixCodeJob {
 
 impl Job for FixCodeJob {
     fn run(&self) -> Result<Value> {
+        self.fix_code()
+            .map(|output| serde_json::to_value(output).expect("Output type is deserializable"))
+    }
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct FixCodeResult {
+    pub code: String,
+    pub explanation: String,
+}
+
+impl FixCodeJob {
+    pub fn fix_code(&self) -> Result<FixCodeResult> {
+        println!("Asking ChatGPT to fix");
         let prompt = match self.model {
             Model::ChatGpt => get_chat_gpt_prompt(&self.output_json, &self.file_contents),
             Model::Mistral => get_mistral_prompt(&self.output_json, &self.file_contents),
@@ -130,12 +144,13 @@ impl Job for FixCodeJob {
 
         // Get the content from the message
         let content = choice.message.content.clone();
-        println!("content: {}", content);
-        println!("finish reason: {}", choice.finish_reason);
 
         let (code, explain) = extract_response_code(&content);
 
-        Ok(json!({"code": code, "explanation": explain}))
+        Ok(FixCodeResult {
+            code: code.to_string(),
+            explanation: explain.to_string(),
+        })
     }
 }
 
@@ -159,6 +174,5 @@ pub fn extract_response_code(response: &str) -> (String, String) {
             explanation.push('\n');
         }
     }
-
     (response_code, explanation)
 }

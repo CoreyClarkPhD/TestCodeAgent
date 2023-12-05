@@ -1,7 +1,9 @@
+use ai::FixCodeJob;
 use clap::Parser;
+use dialoguer::Confirm;
 use dotenv::dotenv;
 use git::check_unsaved_files;
-use std::{env, path::PathBuf};
+use std::{env, fs, path::PathBuf};
 
 use anyhow::Result;
 
@@ -86,15 +88,45 @@ fn main() -> Result<()> {
 
     system::create_worker_thread();
 
-    let result = flowscript::execute_flowscript(
-        &script,
-        CompileJob {
-            files: file_paths.clone(),
-            fix_warnings: args.fix_warnings,
-        },
-    )?;
+    loop {
+        println!("Compiling...");
+        let result = flowscript::execute_flowscript(
+            &script,
+            CompileJob {
+                files: file_paths.clone(),
+                fix_warnings: args.fix_warnings,
+            },
+        )?;
 
-    let errors: Vec<MappedJsonError> = serde_json::from_value(result)?;
+        let errors: Vec<MappedJsonError> = serde_json::from_value(result)?;
+
+        if errors.len() == 0 {
+            println!("No errors found :)");
+            break;
+        }
+
+        println!("Found {} errors", errors.len());
+
+        let first_error = errors.get(0).expect("Vec has an error");
+
+        let fix = FixCodeJob {
+            model: ai::Model::ChatGpt,
+            output_json: first_error.clone(),
+            file_contents: fs::read_to_string(&first_error.filepath)?,
+        };
+
+        // TODO: RUN IN JOB SYSTEM
+        let result = fix.fix_code()?;
+
+        // Pretty print json of result
+        println!("\n{}", serde_json::to_string_pretty(&result)?);
+
+        let confirmation = Confirm::new().with_prompt("Continue?").interact().unwrap();
+
+        if !confirmation {
+            break;
+        }
+    }
 
     Ok(())
 }
