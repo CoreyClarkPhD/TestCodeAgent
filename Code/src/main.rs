@@ -119,14 +119,17 @@ fn main() -> Result<()> {
             break;
         }
 
-        spin.finish_with_message(format!("Found {} errors", errors.len()));
+        spin.finish_with_message(format!("Errors found: {}", errors.len()));
 
         let first_error = errors.get(0).expect("Vec has an error");
 
         // Restart spin
         let spin = ProgressBar::new_spinner();
         spin.enable_steady_tick(Duration::from_millis(100));
-        spin.set_message("Asking ChatGPT to fix first error.");
+        spin.set_message(format!(
+            "Asking ChatGPT to fix first error.... ({})",
+            first_error.message.trim()
+        ));
 
         let fix = FixCodeJob {
             model: ai::Model::ChatGpt,
@@ -144,11 +147,14 @@ fn main() -> Result<()> {
         match choice {
             MenuOption::Quit => break,
             MenuOption::Tweak => {
-                tweak_code(&result.code);
-                // Save things
+                if let Some(new_code) = tweak_code(&result.code) {
+                    files::replace_code(&first_error.filepath, new_code);
+                } else {
+                    break;
+                }
             }
             MenuOption::Accept => {
-                // Save things
+                files::replace_code(&first_error.filepath, result.code);
             }
         };
     }

@@ -66,7 +66,7 @@ pub fn get_chat_gpt_prompt(output_json: &MappedJsonError, file_contents: &str) -
             "You are an extremely smart assistant that helps with fixing c++ compiler errors \n
 You will be given a json output of the clang compiler and then the original contents of the file.
 Please output a markdown response with the corrected source code and an explanation of what went wrong.
-Print the entire corrected source code file using the ```cpp tag, then an empty line then the explanation.
+Print the entire corrected source code file using the ```cpp tag, then an empty line then the explanation. You must give me the entire file, even if that means making the explanation shorter.
 "
             .to_string(),
     });
@@ -75,7 +75,7 @@ Print the entire corrected source code file using the ```cpp tag, then an empty 
         role: Role::User,
         content: format!(
             "Compiler output: {}\nOriginal File: {}\n",
-            serde_json::to_string_pretty(output_json).expect("Pretty print jso"),
+            serde_json::to_string_pretty(output_json).expect("Pretty print json"),
             file_contents
         ),
     });

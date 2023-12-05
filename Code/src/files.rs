@@ -1,5 +1,5 @@
 use anyhow::Result;
-use std::path::PathBuf;
+use std::{path::PathBuf, io::Write};
 
 pub fn get_all_cpp_files_in_folder_path(path: &PathBuf) -> Result<Vec<PathBuf>> {
     let mut files = Vec::new();
@@ -19,4 +19,18 @@ pub fn get_all_cpp_files_in_folder_path(path: &PathBuf) -> Result<Vec<PathBuf>> 
     }
 
     Ok(files)
+}
+
+
+
+// TODO: Replace with a snippet
+pub fn replace_code(path: &PathBuf, new_code: String) {
+    // Smartly insert the new code
+    let mut file = std::fs::OpenOptions::new()
+        .write(true)
+        .truncate(true)
+        .open(path)
+        .expect("Open file");
+
+    file.write_all(new_code.as_bytes()).expect("Write file");
 }

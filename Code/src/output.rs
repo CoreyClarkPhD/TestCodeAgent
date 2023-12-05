@@ -1,3 +1,5 @@
+use std::path::PathBuf;
+
 use anyhow::anyhow;
 use anyhow::Result;
 use serde::{Deserialize, Serialize};
@@ -8,8 +10,8 @@ use crate::{compiler::ClangOutputJson, system::job_core::Job};
 pub struct MappedJsonError {
     column: i32,
     line: i32,
-    pub filepath: String,
-    message: String,
+    pub filepath: PathBuf,
+    pub message: String,
     snippet: String,
 }
 
@@ -48,7 +50,7 @@ impl OutputJob {
     }
 }
 
-fn get_file_snippet(filepath: &str, line: i32) -> Result<String> {
+fn get_file_snippet(filepath: &PathBuf, line: i32) -> Result<String> {
     let file_contents = std::fs::read_to_string(filepath)?;
     let lines: Vec<_> = file_contents.lines().collect();
 

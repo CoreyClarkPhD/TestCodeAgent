@@ -9,7 +9,7 @@ use crate::system::job_core::Job;
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Location {
-    pub file: String,
+    pub file: PathBuf,
     pub line: i32,
     pub column: i32,
 }
