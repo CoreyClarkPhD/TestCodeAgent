@@ -2,14 +2,10 @@ use std::path::PathBuf;
 
 use git2::Repository;
 
-pub enum GitError {
-    UnsavedFiles,
-    UncommittedFiles,
-}
 
-pub fn check_unsaved_files(path: &PathBuf) -> Result<(), GitError> {
+pub fn check_unsaved_files(path: &PathBuf) -> bool {
     let Ok(repo) = Repository::open(path) else {
-        return Ok(());
+        return false
     };
 
     let mut status_opts = git2::StatusOptions::new();
@@ -36,12 +32,12 @@ pub fn check_unsaved_files(path: &PathBuf) -> Result<(), GitError> {
     }
 
     if unsaved_files {
-        return Err(GitError::UnsavedFiles);
+        return true
     }
 
     if uncommitted_files {
-        return Err(GitError::UncommittedFiles);
+        return true
     }
 
-    Ok(())
+    false
 }

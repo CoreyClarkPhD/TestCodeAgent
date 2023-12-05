@@ -39,6 +39,7 @@ pub struct TaskNode {
 
 impl Node for TaskNode {
     fn execute(&self, input: Value, _node_map: &NodeMap) -> Result<Value> {
+        // Run the task in the job system
         let result = system::run_job_fs(self.command.clone(), input);
         match self.points_to {
             Some(ref points_to) => {
