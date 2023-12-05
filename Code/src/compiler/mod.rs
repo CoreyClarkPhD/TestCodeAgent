@@ -76,12 +76,10 @@ impl CompileJob {
 
         let output = output
             .lines()
-            .into_iter()
-            .map(|text| {
+            .flat_map(|text| {
                 let json: Vec<ClangOutputJson> = serde_json::from_str(text).unwrap();
                 json
             })
-            .flatten()
             .collect();
 
         Ok(output)

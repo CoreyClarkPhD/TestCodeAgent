@@ -1,7 +1,7 @@
 use serde_json::{from_value, Value};
 use anyhow::Result;
 
-use crate::{ai::CompileFix, TestJob, compiler::CompileJob};
+use crate::{ai::CompileFix, compiler::CompileJob};
 
 use super::types::JobType;
 

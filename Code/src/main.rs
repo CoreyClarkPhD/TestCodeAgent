@@ -104,7 +104,7 @@ fn main() -> Result<()> {
 
     system::create_worker_thread();
 
-    let result = flowscript::execute_flowscript(
+    let _result = flowscript::execute_flowscript(
         &script,
         CompileJob {
             files: file_paths.clone(),

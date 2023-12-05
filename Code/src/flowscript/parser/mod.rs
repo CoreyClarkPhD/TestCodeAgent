@@ -282,7 +282,7 @@ pub fn extract_definitions(script: &str) -> Result<Defs, pest::error::Error<Rule
     let mut vars = HashMap::new();
     let mut conns = Vec::new();
 
-    let parse = FlowscriptParser::parse(Rule::program, &script)?;
+    let parse = FlowscriptParser::parse(Rule::program, script)?;
 
     let defs: Vec<Pair<Rule>> = parse
         .flatten()
