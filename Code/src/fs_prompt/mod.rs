@@ -14,7 +14,7 @@ pub fn get_flowscript_compile(reprompt: bool) -> Result<String> {
     }
 }
 
-pub fn save_prompt(prompt: &str) -> Result<()> {
+pub fn save_flowscript(prompt: &str) -> Result<()> {
     if let Ok(home) = env::var("HOME") {
         let path = format!("{}/.fsprompt", home);
         fs::write(path, prompt)?;

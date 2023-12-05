@@ -1,7 +1,7 @@
 use anyhow::Result;
 use serde_json::{from_value, Value};
 
-use crate::{ai::FixCodeJob, compiler::CompileJob};
+use crate::{ai::FixCodeJob, compiler::CompileJob, output::OutputJob};
 
 use super::types::JobType;
 
@@ -10,7 +10,6 @@ pub trait Job {
 }
 
 pub fn run_job(job_type: JobType, input: Value) -> Value {
-    println!("Running job {:?}", job_type);
     let result = match job_type {
         JobType::FixCode => {
             let intoed: FixCodeJob = from_value(input).expect("Valid json");
@@ -20,7 +19,10 @@ pub fn run_job(job_type: JobType, input: Value) -> Value {
             let intoed: CompileJob = from_value(input).expect("Valid json");
             intoed.run()
         }
-        _ => panic!("Job not found"),
+        JobType::Output => {
+            let intoed: OutputJob = from_value(input).expect("Valid json");
+            intoed.run()
+        }
     };
 
     match result {

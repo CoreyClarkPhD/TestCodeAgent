@@ -25,7 +25,6 @@ void JobWorkerThread::Work() {
 
     while (true) {
         if (this->isStopping) {
-            std::cout << "JobWorkerThread::Work() is stopping" << std::endl;
             return;
         }
         if (this->_job.get() == nullptr) {
@@ -39,12 +38,9 @@ void JobWorkerThread::Work() {
             }
         }
         if (this->_job.get() != nullptr) {
-            std::cout << "JobWorkerThread::Work() has a job" << this->_job->type << std::endl;
-            // THIS IS WHERE THE NEW MAGIC HAPPENS
-            const char* result = run_rust_job(this->_job->type.c_str(), this->_job->input.c_str());
-
-            std::cout << "JobWorkerThread::Work() got result " << result << std::endl;
-            // this->_job->Execute(_job->input.value());
+            // THIS IS WHERE THE MAGIC HAPPENS
+            const char *result = run_rust_job(this->_job->type.c_str(),
+                                              this->_job->input.c_str());
 
             // Move job to complete queue
             system->setResultFromWorker(this->_job->id, result);
@@ -55,10 +51,7 @@ void JobWorkerThread::Work() {
     }
 }
 
-void JobWorkerThread::Shutdown() {
-    std::cout << "JobWorkerThread::Shutdown()" << std::endl;
-    this->isStopping = true;
-}
+void JobWorkerThread::Shutdown() { this->isStopping = true; }
 
 bool JobWorkerThread::IsShutDown() const {
     return this->_job.get() == nullptr && this->isStopping;

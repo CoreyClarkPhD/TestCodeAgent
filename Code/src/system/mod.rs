@@ -141,9 +141,7 @@ pub extern "C" fn run_rust_job(
             .clone();
         let input: serde_json::Value = serde_json::from_str(input.as_str()).expect("Valid json");
 
-        println!("Getting jobtype: {}", job_type);
         let proper_job_type: JobType = serde_json::from_str(&job_type).unwrap();
-        println!("C++ : {}, enum : {:?}", job_type, proper_job_type);
         let result = crate::system::job_core::run_job(proper_job_type, input);
 
         let c_result = Box::into_raw(Box::new(

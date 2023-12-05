@@ -9,7 +9,7 @@ use anyhow::Result;
 
 use fs_prompt::get_flowscript_compile;
 
-use crate::{compiler::CompileJob, fs_prompt::save_prompt};
+use crate::{compiler::CompileJob, fs_prompt::save_flowscript, output::MappedJsonError};
 
 mod ai;
 mod compiler;
@@ -91,25 +91,25 @@ fn main() -> Result<()> {
         }
     }
 
-    // println!("Files: {:?}", file_paths);
-
     let Ok(script) = get_flowscript_compile(args.reprompt_flowscript) else {
         println!("Error getting flowscript");
         return Ok(());
     };
 
     if args.reprompt_flowscript {
-        save_prompt(&script)?;
+        save_flowscript(&script)?;
     }
 
     system::create_worker_thread();
 
-    let _result = flowscript::execute_flowscript(
+    let result = flowscript::execute_flowscript(
         &script,
         CompileJob {
             files: file_paths.clone(),
         },
     )?;
+
+    let errors: Vec<MappedJsonError> = serde_json::from_value(result)?;
 
     Ok(())
 }

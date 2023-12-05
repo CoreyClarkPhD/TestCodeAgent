@@ -1,4 +1,5 @@
 use anyhow::Result;
+use serde_json::json;
 use std::path::PathBuf;
 
 use serde::Deserialize;
@@ -7,15 +8,15 @@ use serde::Serialize;
 use crate::system::job_core::Job;
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
-struct Location {
-    file: String,
-    line: i32,
-    column: i32,
+pub struct Location {
+    pub file: String,
+    pub line: i32,
+    pub column: i32,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
-struct LocationPair {
-    caret: Location,
+pub struct LocationPair {
+    pub caret: Location,
     finish: Option<Location>,
 }
 
@@ -30,8 +31,8 @@ pub enum ErrorKind {
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct ClangOutputJson {
     kind: ErrorKind,
-    message: String,
-    locations: Vec<LocationPair>,
+    pub message: String,
+    pub locations: Vec<LocationPair>,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -41,9 +42,7 @@ pub struct CompileJob {
 
 impl Job for CompileJob {
     fn run(&self) -> Result<serde_json::Value> {
-        self.compile().map(|output| {
-            serde_json::to_value(output).expect("Struct with deserialize to deseralize")
-        })
+        self.compile().map(|output| json!({"errors": output}))
     }
 }
 
