@@ -9,16 +9,22 @@ use anyhow::Result;
 
 use fs_prompt::get_flowscript_compile;
 
-use crate::{compiler::CompileJob, fs_prompt::save_flowscript, output::MappedJsonError};
+use crate::{
+    compiler::CompileJob,
+    fs_prompt::save_flowscript,
+    output::MappedJsonError,
+    ui::{prompt_options, render_fix_code_result},
+};
 
-mod ai;
-mod compiler;
-mod files;
-mod flowscript;
-mod fs_prompt;
-mod git;
-mod output;
-mod system;
+mod ai; // Sends requests to ChatGPT
+mod compiler; // Compiles provides c++ source code
+mod files; // Utility for default file input
+mod flowscript; // Parse and execute Flowscript
+mod fs_prompt; // Asks ChatGPT to write Flowscript
+mod git; // Checks to make sure there are no uncommitted changes
+mod output; // Maps the g++ error json shape to the desired shape
+mod system; // Job System and C++ bindings
+mod ui; // Renders console output
 
 #[derive(Parser, Debug)]
 #[command(author, version, about)]
@@ -77,6 +83,10 @@ fn main() -> Result<()> {
         return Ok(());
     }
 
+    if args.reprompt_flowscript {
+        println!("Reprompting flowscript");
+    }
+
     let Ok(script) = get_flowscript_compile(args.reprompt_flowscript) else {
         println!("Error getting flowscript");
         return Ok(());
@@ -117,9 +127,8 @@ fn main() -> Result<()> {
 
         // TODO: RUN IN JOB SYSTEM
         let result = fix.fix_code()?;
-
-        // Pretty print json of result
-        println!("\n{}", serde_json::to_string_pretty(&result)?);
+        render_fix_code_result(&result);
+        let choice = prompt_options();
 
         let confirmation = Confirm::new().with_prompt("Continue?").interact().unwrap();
 

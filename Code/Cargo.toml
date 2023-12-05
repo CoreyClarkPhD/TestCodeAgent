@@ -16,7 +16,7 @@ anyhow = "1.0.75"
 reqwest = { version = "0.11.22", features = ["blocking"] }
 dotenv = "0.15.0"
 git2 = "0.18.1"
-dialoguer = "0.11.0"
+dialoguer = {version = "0.11.0"}
 
 [build-dependencies]
 cc = "1.0"
