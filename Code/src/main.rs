@@ -32,6 +32,9 @@ struct Args {
 
     #[arg(short, long, name = "OpenAI API Key")]
     api_key: Option<String>,
+
+    #[arg(short, long, name = "Fix warnings", default_value = "false")]
+    fix_warnings: bool,
 }
 
 fn main() -> Result<()> {
@@ -87,6 +90,7 @@ fn main() -> Result<()> {
         &script,
         CompileJob {
             files: file_paths.clone(),
+            fix_warnings: args.fix_warnings,
         },
     )?;
 

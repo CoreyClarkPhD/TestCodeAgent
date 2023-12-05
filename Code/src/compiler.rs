@@ -20,7 +20,7 @@ pub struct LocationPair {
     finish: Option<Location>,
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
 pub enum ErrorKind {
     #[serde(rename = "error")]
     Error,
@@ -38,6 +38,7 @@ pub struct ClangOutputJson {
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct CompileJob {
     pub files: Vec<PathBuf>,
+    pub fix_warnings: bool,
 }
 
 impl Job for CompileJob {
@@ -68,6 +69,13 @@ impl CompileJob {
             .flat_map(|text| {
                 let json: Vec<ClangOutputJson> = serde_json::from_str(text).unwrap();
                 json
+            })
+            .filter(|error| {
+                if self.fix_warnings {
+                    true
+                } else {
+                    error.kind == ErrorKind::Error
+                }
             })
             .collect();
 
