@@ -3,18 +3,8 @@ use std::path::PathBuf;
 
 use serde::Deserialize;
 use serde::Serialize;
-use serde_json::Number;
 
 use crate::system::job_core::Job;
-
-#[derive(Serialize, Deserialize, Debug, Clone)]
-pub struct MappedJsonError {
-    column: Number,
-    line: Number,
-    pub filepath: String,
-    message: String,
-    snippet: String,
-}
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 struct Location {

@@ -1,6 +1,6 @@
 use std::vec;
 
-use crate::compiler::MappedJsonError;
+use crate::output::MappedJsonError;
 
 use super::{Message, Role};
 
