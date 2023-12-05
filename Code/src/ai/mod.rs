@@ -130,7 +130,6 @@ pub struct FixCodeResult {
 
 impl FixCodeJob {
     pub fn fix_code(&self) -> Result<FixCodeResult> {
-        println!("Asking ChatGPT to fix...");
         let prompt = match self.model {
             Model::ChatGpt => get_chat_gpt_prompt(&self.output_json, &self.file_contents),
             Model::Mistral => get_mistral_prompt(&self.output_json, &self.file_contents),

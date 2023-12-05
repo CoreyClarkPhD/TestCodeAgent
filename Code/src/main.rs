@@ -1,9 +1,10 @@
 use ai::FixCodeJob;
 use clap::Parser;
-use dialoguer::Confirm;
 use dotenv::dotenv;
 use git::check_unsaved_files;
-use std::{env, fs, path::PathBuf};
+use indicatif::ProgressBar;
+use std::{env, fs, path::PathBuf, time::Duration};
+use ui::{tweak_code, MenuOption};
 
 use anyhow::Result;
 
@@ -99,7 +100,9 @@ fn main() -> Result<()> {
     system::create_worker_thread();
 
     loop {
-        println!("Compiling...");
+        let spin = ProgressBar::new_spinner();
+        spin.enable_steady_tick(Duration::from_millis(100));
+        spin.set_message("Compiling");
         let result = flowscript::execute_flowscript(
             &script,
             CompileJob {
@@ -107,6 +110,7 @@ fn main() -> Result<()> {
                 fix_warnings: args.fix_warnings,
             },
         )?;
+        spin.finish_and_clear();
 
         let errors: Vec<MappedJsonError> = serde_json::from_value(result)?;
 
@@ -115,9 +119,14 @@ fn main() -> Result<()> {
             break;
         }
 
-        println!("Found {} errors", errors.len());
+        spin.finish_with_message(format!("Found {} errors", errors.len()));
 
         let first_error = errors.get(0).expect("Vec has an error");
+
+        // Restart spin
+        let spin = ProgressBar::new_spinner();
+        spin.enable_steady_tick(Duration::from_millis(100));
+        spin.set_message("Asking ChatGPT to fix first error.");
 
         let fix = FixCodeJob {
             model: ai::Model::ChatGpt,
@@ -127,14 +136,21 @@ fn main() -> Result<()> {
 
         // TODO: RUN IN JOB SYSTEM
         let result = fix.fix_code()?;
+
+        spin.finish_and_clear();
         render_fix_code_result(&result);
         let choice = prompt_options();
 
-        let confirmation = Confirm::new().with_prompt("Continue?").interact().unwrap();
-
-        if !confirmation {
-            break;
-        }
+        match choice {
+            MenuOption::Quit => break,
+            MenuOption::Tweak => {
+                tweak_code(&result.code);
+                // Save things
+            }
+            MenuOption::Accept => {
+                // Save things
+            }
+        };
     }
 
     Ok(())

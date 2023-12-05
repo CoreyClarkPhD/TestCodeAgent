@@ -1,4 +1,4 @@
-use dialoguer::Select;
+use dialoguer::{Editor, Select};
 
 use crate::ai::FixCodeResult;
 
@@ -11,6 +11,7 @@ pub fn render_fix_code_result(result: &FixCodeResult) {
     println!("-----------------------------------------");
 }
 
+#[derive(PartialEq)]
 pub enum MenuOption {
     Accept,
     Tweak,
@@ -32,5 +33,13 @@ pub fn prompt_options() -> MenuOption {
         1 => MenuOption::Tweak,
         2 => MenuOption::Quit,
         _ => panic!("Invalid selection"),
+    }
+}
+
+pub fn tweak_code(code: &str) -> Option<String> {
+    if let Some(rv) = Editor::new().extension(".cpp").edit(code).unwrap() {
+        Some(rv)
+    } else {
+        None
     }
 }
