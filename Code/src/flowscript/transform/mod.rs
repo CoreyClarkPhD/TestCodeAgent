@@ -2,10 +2,7 @@ use std::collections::HashMap;
 
 use serde_json::Value;
 
-use crate::{
-    nodes::{self, CountNode, IfNode, MultiNode, NodeMap, TaskNode},
-    parser::{ConnectionDef, ConnectionType, Defs, NodeDef},
-};
+use super::{parser::{ConnectionDef, ConnectionType, Defs, NodeDef}, nodes::{NodeMap, self, TaskNode, IfNode, CountNode, MultiNode}};
 
 #[derive(Debug)]
 pub enum TransformError {

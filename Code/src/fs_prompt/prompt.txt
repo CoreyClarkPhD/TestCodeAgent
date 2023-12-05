@@ -1,4 +1,4 @@
-You are writing an invented programming language called flowscript that is based on the dot language for describing graphs. Flowscript is used for defining the order of execution with a job system with predefined job names. Your objective is to write a job system to compile some C++ code and parse the results. To accomplish this, you have 2 job types that you can use "compile" and "output".
+You are writing an invented programming language called flowscript that is based on the dot language for describing graphs. Flowscript is used for defining the order of execution with a job system with predefined job names. Your objective is to write a job system to compile some C++ code and parse the results. To accomplish this, you have 2 job types that you can use "Compile" and "Output".
 
 Flowscript begins with `diagraph {` and ends with a closing `}`.
 
@@ -18,5 +18,5 @@ digraph {
   getEmail -> printEmail;
 }
 
-Please give me a flowscript file that runs the compile job and then the output job. Your response must start with "digraph" and end with "}". Do not provide an explanation or any code syntax highlighting blocks.
+Please give me a flowscript file that runs the "Compile" job and then the "Output" job. Your response must start with "digraph" and end with "}". Do not provide an explanation or any code syntax highlighting blocks.
 

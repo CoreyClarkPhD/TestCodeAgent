@@ -1,13 +1,17 @@
 use anyhow::Result;
+use serde::{Serialize, Deserialize};
 use serde_json::Value;
 
-use crate::flowscript::{parser::extract_definitions, transform::TransformError};
+use crate::{flowscript::{parser::extract_definitions, transform::TransformError}, system::job_core};
 
 mod nodes;
 mod parser;
 mod transform;
 
-pub fn execute_flowscript(script: &String, input: Value) -> Result<Value> {
+pub fn execute_flowscript<'a, T: job_core::Job + Serialize + Deserialize<'a>>(
+    script: &String,
+    input: T,
+) -> Result<Value> {
     let defs = match extract_definitions(script) {
         Ok(defs) => defs,
         Err(e) => {
@@ -28,13 +32,11 @@ pub fn execute_flowscript(script: &String, input: Value) -> Result<Value> {
         }
     };
 
-    let Some(input) = graph.get("input") else {
+    let Some(input_node) = graph.get("input") else {
         println!("Error: No input node");
         return Err(anyhow::anyhow!("No input node"));
     };
 
-    let result = input.execute(input, &graph)?;
-    println!("{}", result);
-
-    todo!()
+    let input_json = serde_json::to_value(input)?;
+    input_node.execute(input_json, &graph)
 }

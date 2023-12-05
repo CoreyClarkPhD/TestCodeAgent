@@ -17,23 +17,48 @@ pub struct MappedJsonError {
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
-pub struct ClangOutputJson {}
+struct Location {
+    file: String,
+    line: i32,
+    column: i32,
+}
 
+#[derive(Serialize, Deserialize, Debug, Clone)]
+struct LocationPair {
+    caret: Location,
+    finish: Option<Location>,
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub enum ErrorKind {
+    #[serde(rename = "error")]
+    Error,
+    #[serde(rename = "warning")]
+    Warning,
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct ClangOutputJson {
+    kind: ErrorKind,
+    message: String,
+    locations: Vec<LocationPair>,
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct CompileJob {
-    files: Vec<PathBuf>,
+    pub files: Vec<PathBuf>,
 }
 
 impl Job for CompileJob {
     fn run(&self) -> Result<serde_json::Value> {
-        match self.compile() {
-            Ok(output) => Ok(serde_json::to_value(output)?),
-            Err(e) => Err(e),
-        }
+        self.compile().map(|output| {
+            serde_json::to_value(output).expect("Struct with deserialize to deseralize")
+        })
     }
 }
 
 impl CompileJob {
-    pub fn compile(&self) -> Result<ClangOutputJson> {
+    pub fn compile(&self) -> Result<Vec<ClangOutputJson>> {
         let joined_files: Vec<_> = self.files.iter().map(|p| p.to_string_lossy()).collect();
         let joined_files = joined_files.join(" ");
 
@@ -51,12 +76,14 @@ impl CompileJob {
 
         let output = output
             .lines()
-            .filter(|line| line.starts_with('{'))
-            .collect::<Vec<_>>()
-            .join("");
+            .into_iter()
+            .map(|text| {
+                let json: Vec<ClangOutputJson> = serde_json::from_str(text).unwrap();
+                json
+            })
+            .flatten()
+            .collect();
 
-        println!("{}", output);
-
-        Ok(ClangOutputJson{})
+        Ok(output)
     }
 }
