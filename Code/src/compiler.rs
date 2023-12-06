@@ -53,11 +53,9 @@ impl CompileJob {
         let joined_files = joined_files.join(" ");
 
         let command = format!(
-            "g++-13 -std=c++17 {} -fdiagnostics-format=json",
+            "g++-13 -std=c++17 {} -Wextra -Weffc++ -fdiagnostics-format=json",
             joined_files
         );
-
-        println!("Running command: {}", command);
 
         let command_output = std::process::Command::new("sh")
             .arg("-c")

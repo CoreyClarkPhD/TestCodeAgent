@@ -153,7 +153,6 @@ impl FixCodeJob {
     }
 }
 
-// TODO: FIX
 pub fn extract_response_code(response: &str) -> (String, String) {
     let mut response_code = String::new();
     let mut explanation = String::new();

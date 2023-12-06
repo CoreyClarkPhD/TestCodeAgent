@@ -1,9 +1,10 @@
-use ai::FixCodeJob;
+use ai::{FixCodeJob, FixCodeResult};
 use clap::Parser;
 use dotenv::dotenv;
 use git::check_unsaved_files;
 use indicatif::ProgressBar;
 use std::{env, fs, path::PathBuf, time::Duration};
+use system::types::JobType;
 use ui::{tweak_code, MenuOption};
 
 use anyhow::Result;
@@ -88,14 +89,27 @@ fn main() -> Result<()> {
         }
     }
 
+    let mut spinner = Option::None;
     if args.reprompt_flowscript {
-        println!("Reprompting flowscript");
+        spinner = Some(ProgressBar::new_spinner());
+        spinner
+            .as_mut()
+            .unwrap()
+            .enable_steady_tick(Duration::from_millis(100));
+        spinner
+            .as_mut()
+            .unwrap()
+            .set_message("Getting flowscript...");
     }
 
     let Ok(script) = get_flowscript_compile(args.reprompt_flowscript) else {
         println!("Error getting flowscript");
         return Ok(());
     };
+
+    if let Some(spinner) = spinner {
+        spinner.finish_and_clear();
+    }
 
     if args.reprompt_flowscript {
         save_flowscript(&script)?;
@@ -149,8 +163,12 @@ fn main() -> Result<()> {
             file_contents: fs::read_to_string(&first_error.filepath)?,
         };
 
-        // TODO: RUN IN JOB SYSTEM
-        let result = fix.fix_code()?;
+        let Ok(result) =
+            serde_json::from_value::<FixCodeResult>(system::run_job(JobType::FixCode, fix))
+        else {
+            println!("Error getting  code result");
+            return Ok(());
+        };
 
         spin.finish_and_clear();
         render_fix_code_result(&result);
