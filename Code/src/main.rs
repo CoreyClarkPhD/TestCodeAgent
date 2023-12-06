@@ -189,5 +189,7 @@ fn main() -> Result<()> {
         };
     }
 
+
+    system::destroy();
     Ok(())
 }

@@ -19,7 +19,6 @@ pub fn execute_flowscript<'a, T: job_core::Job + Serialize + Deserialize<'a>>(
             return Err(anyhow::anyhow!("Error parsing file"));
         }
     };
-
     let graph = match transform::defs_to_graph(defs) {
         Ok(graph) => graph,
         Err(e) => {
