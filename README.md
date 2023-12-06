@@ -1,6 +1,10 @@
 [![Review Assignment Due Date](https://classroom.github.com/assets/deadline-readme-button-24ddc0f5d75046c5622901739e7c5dd533143b0c8e959d652212380cedb1ea36.svg)](https://classroom.github.com/a/d5tDVxWv)
 [![Open in Codespaces](https://classroom.github.com/assets/launch-codespace-7f7980b617ed060a017424585567c406b6ee15c891e84e1186181d67ecf80aa0.svg)](https://classroom.github.com/open-in-codespaces?assignment_repo_id=13122778)
 
+
+https://github.com/HuMIn-Game-Lab/final-autonomous-code-assistant-agent-drew-harris/assets/61394759/8c1074aa-113e-46ae-9d5e-eef2158df529
+
+
 # Report
 
 My autonomous code agent was created as a CLI tool that is run inside your C++ project directory. It will attempt to compile a set of C++ files and will ask ChatGPT to fix the code and provide explanations of what it changed. It is written in Rust and uses a job system written in C++ to launch specific jobs that are executed back in Rust. The three jobs that are used are a compile job, an output job, and a "fix code" job.
