@@ -34,19 +34,19 @@ struct Args {
     #[arg(num_args = 1.., value_delimiter = ' ', help = "Input files")]
     files: Vec<PathBuf>,
 
-    #[arg(short, long, default_value = "false")]
+    #[arg(short, long, help="Reprompts ChatGPT to get a new flowscript file", default_value = "false")]
     reprompt_flowscript: bool,
 
-    #[arg(short, long, name = "Directory", default_value = ".")]
+    #[arg(short, long, name = "Directory", help="Compile all C++ files in directory", default_value = ".")]
     directory: PathBuf,
 
-    #[arg(short, long, name = "OpenAI API Key")]
+    #[arg(short, long, name = "OpenAI API Key", help="Your OpenAI API Key")]
     api_key: Option<String>,
 
     #[arg(short, long, name = "Fix warnings", default_value = "false")]
     fix_warnings: bool,
 
-    #[arg(long, name = "Allow dirty", default_value = "false")]
+    #[arg(long, name = "Allow dirty", help = "Allows running agent with uncommitted files", default_value = "false")]
     allow_dirty: bool,
 }
 
