@@ -20,3 +20,5 @@ Cargo.lock
 *.so
 
 .DS_Store
+
+*.out
