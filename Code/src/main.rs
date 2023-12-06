@@ -44,6 +44,9 @@ struct Args {
 
     #[arg(short, long, name = "Fix warnings", default_value = "false")]
     fix_warnings: bool,
+
+    #[arg(long, name = "Allow dirty", default_value = "false")]
+    allow_dirty: bool,
 }
 
 fn main() -> Result<()> {
@@ -78,10 +81,11 @@ fn main() -> Result<()> {
     }
 
     // Check for unsaved files
-    // TODO: Condense
-    if check_unsaved_files(&args.directory) {
-        println!("Uncommitted files found. Please commit, discard or stash them before running the code agent.");
-        return Ok(());
+    if !args.allow_dirty {
+        if check_unsaved_files(&args.directory) {
+            println!("Uncommitted files found. Please commit, discard or stash them before running the code agent.");
+            return Ok(());
+        }
     }
 
     if args.reprompt_flowscript {
@@ -98,6 +102,14 @@ fn main() -> Result<()> {
     }
 
     system::create_worker_thread();
+
+    // Check that file_paths are cpp files
+    for path in &file_paths {
+        if path.extension().unwrap_or_default() != "cpp" {
+            println!("Error: {} is not a cpp file", path.to_string_lossy());
+            return Ok(());
+        }
+    }
 
     loop {
         let spin = ProgressBar::new_spinner();

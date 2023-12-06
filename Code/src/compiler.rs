@@ -57,6 +57,8 @@ impl CompileJob {
             joined_files
         );
 
+        println!("Running command: {}", command);
+
         let command_output = std::process::Command::new("sh")
             .arg("-c")
             .arg(command)
@@ -64,10 +66,16 @@ impl CompileJob {
 
         let output = String::from_utf8(command_output.stderr)?;
 
+        // Check if there are any errors
+        if output.is_empty() {
+            return Ok(Vec::new());
+        }
+
         let output = output
             .lines()
             .flat_map(|text| {
-                let json: Vec<ClangOutputJson> = serde_json::from_str(text).unwrap();
+                let json: Vec<ClangOutputJson> = serde_json::from_str(text)
+                    .expect("g++ does not output valid json, do you have a main method?");
                 json
             })
             .filter(|error| {
