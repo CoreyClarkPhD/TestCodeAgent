@@ -22,6 +22,8 @@ pub struct LocationPair {
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
 pub enum ErrorKind {
+    #[serde(rename = "note")]
+    Note,
     #[serde(rename = "error")]
     Error,
     #[serde(rename = "warning")]
@@ -78,7 +80,7 @@ impl CompileJob {
             })
             .filter(|error| {
                 if self.fix_warnings {
-                    true
+                    error.kind == ErrorKind::Error || error.kind == ErrorKind::Warning
                 } else {
                     error.kind == ErrorKind::Error
                 }

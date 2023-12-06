@@ -4,7 +4,7 @@ use git2::Repository;
 
 
 pub fn check_unsaved_files(path: &PathBuf) -> bool {
-    let Ok(repo) = Repository::open(path) else {
+    let Ok(repo) = Repository::open("../") else {
         return false
     };
 

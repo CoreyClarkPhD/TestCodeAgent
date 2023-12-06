@@ -84,7 +84,7 @@ fn main() -> Result<()> {
     // Check for unsaved files
     if !args.allow_dirty {
         if check_unsaved_files(&args.directory) {
-            println!("Uncommitted files found. Please commit, discard or stash them before running the code agent.");
+            println!("Uncommitted files found. Please commit, discard or stash them before running the code agent, or run with --allow-dirty");
             return Ok(());
         }
     }
